@@ -15,10 +15,9 @@ public class ChatServer {
    private static final String TAG = "ChatServer :";
    private Vector<ClientInfo> vc; // 연결된 클라이언트 소켓을 담는 컬렉션
    private FileWriter txt;
-   
-   
+
+
    public ChatServer() {
-      // TODO Auto-generated constructor stub
       try {
          vc = new Vector<>();
          serverSocket = new ServerSocket(10000);
@@ -26,32 +25,30 @@ public class ChatServer {
          // 메인쓰레드의 역할
          while (true) {
             Socket socket = serverSocket.accept();
+            System.out.println(TAG + "연결 성공");
             ClientInfo clientInfo = new ClientInfo(socket);
             clientInfo.start();
             vc.add(clientInfo);
          }
       } catch (IOException e) {
-         // TODO Auto-generated catch block
          e.printStackTrace();
          System.out.println("실패");
       }
    }
 
    class ClientInfo extends Thread {
-      
+
       String id;
       Socket socket;
       BufferedReader reader;
       PrintWriter writer; // BufferdWriter와 다른점은 내려쓰기 함수를 지원
 
       public ClientInfo(Socket socket) {
-         // TODO Auto-generated constructor stub
          this.socket = socket;
          try {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(socket.getOutputStream());
          } catch (Exception e) {
-            // TODO: handle exception
             System.out.println("서버 연결 실패:" + e.getMessage());
             e.printStackTrace();
          }
@@ -60,7 +57,6 @@ public class ChatServer {
       // 역할 : 클라이언트로 부터 받은 메시지를 모든 클라이언트 한테 재전송
       @Override
       public void run() {
-         // TODO Auto-generated method stub
          try {
                String input = null;
                writer.println("아이디를 입력하세요. 예)ID:아이디");
@@ -96,9 +92,9 @@ public class ChatServer {
             }
 
       }
-      
-      
-      
+
+
+
    }
    public static void main(String[] args) {
          new ChatServer();

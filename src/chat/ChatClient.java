@@ -1,17 +1,8 @@
 package chat;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.ScrollPane;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
 import java.net.Socket;
 
 import javax.swing.JButton;
@@ -38,8 +29,8 @@ public class ChatClient extends JFrame {
    private PrintWriter writer;
    private BufferedReader reader;
 
+
    public ChatClient() {
-      // TODO Auto-generated constructor stub
       init();
       setting();
       batch();
@@ -84,7 +75,6 @@ public class ChatClient extends JFrame {
       btnConnect.addActionListener(new ActionListener() {
          @Override
          public void actionPerformed(ActionEvent e) {
-            // TODO Auto-generated method stub
             connect();
          }
       });
@@ -93,7 +83,6 @@ public class ChatClient extends JFrame {
 
          @Override
          public void actionPerformed(ActionEvent e) {
-            // TODO Auto-generated method stub
             send();
          }
       });
@@ -105,12 +94,21 @@ public class ChatClient extends JFrame {
 				}
 			}
 		});
+      this.addWindowListener(new WindowAdapter() {
+
+         @Override
+         public void windowClosing(WindowEvent e) {
+            System.out.println("종료버튼실행");
+            ChatClient client = new ChatClient();
+            client.save();
+         }
+      });
    }
 
    private void send() {
       String chat = tfChat.getText();
       // 1번 taChatList 뿌리기
-      taChatList.append("[내 메시지] " + chat + "\n");
+      taChatList.append("[내메시지] " + chat + "\n");
       writer.write(chat + "\n");
       writer.flush();
 
@@ -127,16 +125,30 @@ public class ChatClient extends JFrame {
          ReaderThread rt = new ReaderThread();
          rt.start();
       } catch (Exception e1) {
-         // TODO Auto-generated catch block
          System.out.println(TAG + "서버 연결 에러" + e1.getMessage());
       }
+   }
+
+   private void save(){
+      try{
+         System.out.println("세이브실행");
+         //TODO : JTextArea 저장방법
+         FileWriter fw = new FileWriter("TEST.txt");
+         String str = "test test";
+         fw.write(str);
+         fw.flush();
+//         fw.close();
+         System.out.println("성공");
+      }catch(Exception e){
+         e.printStackTrace();
+      }
+
    }
 
    class ReaderThread extends Thread {
       // while을 돌면서 서버로부터 메시지를 받아서 taChatList에 뿌리기
       @Override
       public void run() {
-         // TODO Auto-generated method stub
          try {
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String input = null;
@@ -145,7 +157,6 @@ public class ChatClient extends JFrame {
             }
 
          } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
          }
       }
