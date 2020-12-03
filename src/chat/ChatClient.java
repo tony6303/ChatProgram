@@ -1,9 +1,22 @@
 package chat;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.ScrollPane;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -28,6 +41,9 @@ public class ChatClient extends JFrame {
    private Socket socket;
    private PrintWriter writer;
    private BufferedReader reader;
+   
+   private FileWriter fw;
+   private List<String> fileString;
 
 
    public ChatClient() {
@@ -48,6 +64,13 @@ public class ChatClient extends JFrame {
       scrollPane = new ScrollPane();
       topPanel = new JPanel();
       bottomPanel = new JPanel();
+      fileString = new ArrayList<>();
+      try {
+		fw = new FileWriter("D:/TEST.txt");
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
    }
 
    private void setting() {
@@ -99,10 +122,11 @@ public class ChatClient extends JFrame {
          @Override
          public void windowClosing(WindowEvent e) {
             System.out.println("종료버튼실행");
-            ChatClient client = new ChatClient();
-            client.save();
+           save();
          }
       });
+      
+      
    }
 
    private void send() {
@@ -110,6 +134,7 @@ public class ChatClient extends JFrame {
       // 1번 taChatList 뿌리기
       taChatList.append("[내메시지] " + chat + "\n");
       writer.write(chat + "\n");
+      fileString.add("[내메시지] " +chat);
       writer.flush();
 
       // chat 비우기
@@ -133,11 +158,15 @@ public class ChatClient extends JFrame {
       try{
          System.out.println("세이브실행");
          //TODO : JTextArea 저장방법
-         FileWriter fw = new FileWriter("TEST.txt");
-         String str = "test test";
-         fw.write(str);
-         fw.flush();
-//         fw.close();
+        
+    
+         for (int i = 0; i < fileString.size(); i++) {
+			fw.write(fileString.get(i)+"\n");
+			 fw.flush();
+		}
+       
+        
+         fw.close();
          System.out.println("성공");
       }catch(Exception e){
          e.printStackTrace();
@@ -154,6 +183,7 @@ public class ChatClient extends JFrame {
             String input = null;
             while ((input = reader.readLine()) != null) {
                taChatList.append(input + "\n");
+               fileString.add(input);
             }
 
          } catch (IOException e) {
